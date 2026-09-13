@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import uuid
+from dotenv import load_dotenv
+load_dotenv()
 from repo_rector.orchestrator import Orchestrator
 
 app = FastAPI(title="CodeNova API", description="API for the CodeNova AI Agent")
