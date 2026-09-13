@@ -2,5 +2,9 @@ venv/
 __pycache__/
 *.pyc
 memory.db
+repo_rector_memory.db
+*.db
 .repo_rector_chroma/
+chroma_db/
 .env
+
