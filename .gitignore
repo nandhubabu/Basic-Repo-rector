@@ -1,0 +1,6 @@
+venv/
+__pycache__/
+*.pyc
+memory.db
+.repo_rector_chroma/
+.env
