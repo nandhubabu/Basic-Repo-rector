@@ -7,7 +7,7 @@ load_dotenv()
 class AppConfig(BaseModel):
     # LLM settings
     default_llm_provider: str = Field(default="gemini")
-    gemini_model: str = Field(default="gemini-3.6-flash")
+    gemini_model: str = Field(default="gemini-3.5-flash-lite")
     ollama_model: str = Field(default="llama3")
     groq_model: str = Field(default="llama3-8b-8192")
     
@@ -22,7 +22,7 @@ class AppConfig(BaseModel):
     def load_from_env(cls) -> "AppConfig":
         return cls(
             default_llm_provider=os.getenv("RR_LLM_PROVIDER", "gemini"),
-            gemini_model=os.getenv("RR_GEMINI_MODEL", "gemini-3.6-flash"),
+            gemini_model=os.getenv("RR_GEMINI_MODEL", "gemini-3.5-flash-lite"),
             ollama_model=os.getenv("RR_OLLAMA_MODEL", "llama3"),
             groq_model=os.getenv("RR_GROQ_MODEL", "llama3-8b-8192"),
             db_path=os.getenv("RR_DB_PATH", "repo_rector_memory.db"),
