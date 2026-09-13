@@ -1,5 +1,6 @@
 from typing import Dict, Any, Optional
 import uuid
+from .config import config
 from .models.agent_state import AgentStatus
 from .models.evaluation import EvalDecision
 from .memory.session_state import SessionManager
@@ -21,7 +22,7 @@ class Orchestrator:
         self.long_term = LongTermMemory()
         
         # Initialize default provider (Gemini free tier)
-        self.llm = GeminiProvider()
+        self.llm = GeminiProvider(model_name=config.gemini_model)
         
         self.planner = Planner(self.llm)
         self.executor = Executor()
@@ -42,18 +43,29 @@ class Orchestrator:
             )
             self.session.set_plan(plan)
             
+            # If no tools are required, answer directly
+            if not plan.steps:
+                direct_response = self.llm.generate(
+                    prompt=f"User request: {user_request}\nProvide a friendly, helpful, and concise response. If this is a greeting or general inquiry, introduce yourself as CodeNova AI and summarize how you can assist with code analysis, refactoring, and test execution.",
+                    system_prompt="You are CodeNova AI, an intelligent autonomous Python codebase refactoring agent."
+                )
+                self.short_term.add_interaction("assistant", direct_response)
+                self.session.update_status(AgentStatus.COMPLETED)
+                return direct_response
+            
             # 2. Execution Loop
             self.session.update_status(AgentStatus.EXECUTING)
             
             while self.session.state.pending_steps and self.session.state.iteration_count < self.session.state.max_iterations:
                 self.session.state.iteration_count += 1
                 
-                # Get next step (simplified: just taking the first pending step)
+                # Get next step (taking the first pending step)
                 current_step = self.session.state.pending_steps.pop(0)
                 current_step.status = "running"
                 
                 # Execute
                 result = self.executor.execute_step(current_step)
+                current_step.result = result
                 
                 # Evaluate
                 self.session.update_status(AgentStatus.EVALUATING)
@@ -67,15 +79,12 @@ class Orchestrator:
                 if eval_result.decision == EvalDecision.SUFFICIENT:
                     current_step.status = "completed"
                     self.session.state.completed_steps.append(current_step)
-                    self.session.update_status(AgentStatus.EXECUTING) # Go back to executing next step
+                    self.session.update_status(AgentStatus.EXECUTING)
                     
                 elif eval_result.decision == EvalDecision.REVISE_PLAN:
                     current_step.status = "failed"
                     current_step.error = eval_result.reasoning
                     self.session.add_error(f"Failed step {current_step.id}: {eval_result.reasoning}")
-                    
-                    # Need to implement plan revision logic here in a full system
-                    # For now, we'll just abort the current loop
                     break
                     
                 elif eval_result.decision == EvalDecision.ABORT:
@@ -83,7 +92,24 @@ class Orchestrator:
                     break
                     
             self.session.update_status(AgentStatus.RESPONDING)
-            final_response = f"Completed {len(self.session.state.completed_steps)} steps. Check logs for details."
+            
+            # Synthesize final response from completed steps
+            steps_summary = "\n".join([
+                f"- Step {s.id} ({s.action}): {'Success' if s.status == 'completed' else 'Failed'}. Result: {s.result or s.error}"
+                for s in self.session.state.completed_steps
+            ])
+            summary_prompt = f"""
+The user asked: {user_request}
+
+Execution Steps Taken:
+{steps_summary}
+
+Please provide a clear, concise, and helpful final summary response to the user.
+"""
+            final_response = self.llm.generate(
+                prompt=summary_prompt,
+                system_prompt="You are CodeNova AI. Synthesize execution results into a clear and grounded response."
+            )
             self.short_term.add_interaction("assistant", final_response)
             
             self.session.update_status(AgentStatus.COMPLETED)
