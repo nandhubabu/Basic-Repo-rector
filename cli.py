@@ -9,7 +9,7 @@ from repo_rector.orchestrator import Orchestrator
 console = Console()
 
 def print_banner():
-    console.print(Panel.fit("[bold blue]Repo-Rector AI[/bold blue]\n[cyan]Your intelligent Python codebase agent[/cyan]"))
+    console.print(Panel.fit("[bold blue]CodeNova AI[/bold blue]\n[cyan]Your intelligent Python codebase agent[/cyan]"))
 
 def chat_mode():
     console.print("[green]Entering chat mode. Type 'exit' or 'quit' to stop.[/green]\n")
@@ -32,7 +32,7 @@ def chat_mode():
                 progress.add_task(description="Thinking...", total=None)
                 response = orchestrator.run(user_input)
                 
-            console.print(f"\n[bold green]Repo-Rector:[/bold green] {response}\n")
+            console.print(f"\n[bold green]CodeNova:[/bold green] {response}\n")
             
         except KeyboardInterrupt:
             break

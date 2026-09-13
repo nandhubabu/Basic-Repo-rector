@@ -1,6 +1,6 @@
-# Repo-Rector AI Agent
+# CodeNova AI Agent
 
-Repo-Rector is an AI-powered Python code improvement agent that uses a multi-tool architecture with planning, execution, and evaluation phases to intelligently refactor and manage your codebase.
+CodeNova is an AI-powered Python code improvement agent that uses a multi-tool architecture with planning, execution, and evaluation phases to intelligently refactor and manage your codebase.
 
 ## Architecture
 

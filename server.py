@@ -3,7 +3,7 @@ from pydantic import BaseModel
 import uuid
 from repo_rector.orchestrator import Orchestrator
 
-app = FastAPI(title="Repo-Rector API", description="API for the Repo-Rector AI Agent")
+app = FastAPI(title="CodeNova API", description="API for the CodeNova AI Agent")
 
 # In-memory store for orchestrators (in a real app, use a DB or redis)
 sessions = {}
