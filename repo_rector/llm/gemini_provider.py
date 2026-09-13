@@ -1,12 +1,16 @@
 import os
+import logging
 from google import genai
 from typing import Optional
 from .base import BaseLLMProvider
 
+# Silence Google GenAI automatic function calling warning on generate_content
+logging.getLogger("google_genai.models").setLevel(logging.ERROR)
+
 class GeminiProvider(BaseLLMProvider):
     """Google Gemini provider implementation (Free tier capable)."""
     
-    def __init__(self, model_name: str = "gemini-2.5-flash"):
+    def __init__(self, model_name: str = "gemini-3.6-flash"):
         api_key = os.getenv("GOOGLE_API_KEY")
         if not api_key:
             raise ValueError("GOOGLE_API_KEY environment variable is missing.")
