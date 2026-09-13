@@ -10,7 +10,7 @@ class Planner:
     def __init__(self, llm_provider: BaseLLMProvider):
         self.llm = llm_provider
         
-    def create_plan(self, user_request: str, available_tools: Dict[str, str], context: str = "") -> Plan:
+    def create_plan(self, user_request: str, available_tools: Any, context: str = "") -> Plan:
         prompt = f"""
         User Request: {user_request}
         

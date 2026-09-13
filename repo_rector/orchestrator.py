@@ -11,6 +11,7 @@ from .executor import Executor
 from .evaluator import Evaluator
 from .llm.gemini_provider import GeminiProvider
 from .tools.base import ToolRegistry
+import repo_rector.tools  # Register default tools
 
 class Orchestrator:
     """Main controller for the iterative agent loop."""
@@ -35,7 +36,7 @@ class Orchestrator:
         try:
             # 1. Analyze Intent & Plan
             self.session.update_status(AgentStatus.PLANNING)
-            available_tools = ToolRegistry.list_tools()
+            available_tools = ToolRegistry.list_tools_detailed()
             plan = self.planner.create_plan(
                 user_request=user_request, 
                 available_tools=available_tools,
